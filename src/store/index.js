@@ -49,7 +49,7 @@ export default createStore({
       axios({
         method: 'post',
         url: '../services/Answers.json',
-        data: value,
+        data: { answer: value },
       })
         .then((response) => {
           this.commit('setRightAnswers', { value });
