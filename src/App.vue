@@ -1,87 +1,20 @@
 <template>
   <div v-if="loading">
-    <div class="question" v-for="(question, idx) in this.questions" :key="idx">
-      <div class="question__category">
-        <h4>Category:</h4>
-        {{ question.category }}
-      </div>
-      <div
-        class="question__difficulty"
-        :style="{
-          color: this.difficultyColor[question.difficulty],
-        }"
-      >
-        <h4>Difficulty:</h4>
-        {{ question.difficulty }}
-      </div>
-      <div class="question__question">
-        <h4>Question:</h4>
-        {{ question.question }}
-      </div>
-      <div>
-        <div class="question__answers">
-          <h4>Answer options:</h4>
-          {{ question.correct_answer }},
-          {{ question.incorrect_answers.join(', ') }}
-        </div>
-      </div>
-      <form
-        action=""
-        @submit.prevent="
-          setRightAnswer(
-            question.correct_answer,
-            this.$refs.value[idx].value,
-            idx,
-          )
-        "
-      >
-        <input
-          class="question__input"
-          ref="value"
-          type="text"
-          placeholder="Write your answer... "
-        />
-        <input class="question__button" type="submit" value="Send" />
-      </form>
-    </div>
-    <div
-      class="right-answers"
-      v-if="questions.length === 0 && this.rightAnswers.length > 5"
-    >
-      <div>Good result! You have:</div>
-      <div class="right-answers-count">
-        {{ rightAnswers.length }}
-      </div>
-      <div>correct answers.</div>
-      <a class="right-answers__link" href="/">Try again</a>
-    </div>
-    <div
-      class="right-answers"
-      v-show="questions.length === 0 && this.rightAnswers.length < 5"
-    >
-      <div>Bad result! You have:</div>
-      <div class="wrong-answers-count">
-        {{ rightAnswers.length }}
-      </div>
-      <div>correct answers.</div>
-      <a class="right-answers__link" href="/">Try again</a>
-    </div>
+    <QuestionItem :questions="this.questions" />
+    <ResultItem :questions="this.questions" :rightAnswers="this.rightAnswers" />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import QuestionItem from './components/QuestionItem.vue';
+import ResultItem from './components/ResultItem.vue';
 
 export default {
   name: 'App',
-  data() {
-    return {
-      difficultyColor: {
-        easy: 'green',
-        medium: 'yellow',
-        hard: 'red',
-      },
-    };
+  components: {
+    QuestionItem,
+    ResultItem,
   },
 
   computed: {
@@ -90,18 +23,6 @@ export default {
 
   created() {
     this.$store.dispatch('getQuestions');
-  },
-
-  methods: {
-    setRightAnswer(correct, value, idx) {
-      if (correct.toLowerCase() === value.toLowerCase()) {
-        this.correctAnswersCount += 1;
-        this.$store.dispatch('setRightAnswer', { value });
-        this.$refs.value[idx].value = '';
-      }
-      this.$store.commit('setAnswer', idx);
-      this.$refs.value[idx].value = '';
-    },
   },
 };
 </script>
